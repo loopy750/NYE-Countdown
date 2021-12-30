@@ -10,5 +10,6 @@ Controls:
 * \+ : Increase size
 * C : Change colour
 * R : Restore initial window position
+* ESC : Exit program
 * Arrow keys : Move window position
 * Alt + Enter : Toggle fullscreen modes
