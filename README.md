@@ -15,3 +15,5 @@ Controls:
 * Page Down : Decrease opacity
 * Arrow keys : Move window position
 * Alt + Enter : Toggle fullscreen modes
+
+[Download](https://github.com/loopy750/NYE-Countdown/raw/main/nye_countdown.exe)
