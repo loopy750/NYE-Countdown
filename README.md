@@ -11,5 +11,7 @@ Controls:
 * C : Change colour
 * R : Restore initial window position
 * ESC : Exit program
+* Page Up : Increase opacity
+* Page Down : Decrease opacity
 * Arrow keys : Move window position
 * Alt + Enter : Toggle fullscreen modes
