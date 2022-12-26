@@ -40,7 +40,10 @@ fontfile$ = rootpath$ + "\Fonts\" + CoreFont 'TTF file in Windows
 style$ = "monospace" 'font style is not case sensitive
 f& = _LoadFont(fontfile$, 128, style$)
 If f& = -1 Then
-    Print CoreFont + " not found, using default font!"
+    Print
+    Print "   " + CoreFont + " not found, using default font!"
+    Print
+    Print "   https://github.com/loopy750";
     Sleep 10
     Cls
     CoreFont = "lucon.ttf"
@@ -52,6 +55,15 @@ If f& = -1 Then
     CoreFontHeightOffset = 1.13
     Screen _NewImage(542 * CoreFontWidthOffset, 102 * CoreFontHeightOffset, 32)
 End If
+
+Print
+Print "   NYE Countdown"
+Print "   -------------"
+Print
+Print "   https://github.com/loopy750";
+Sleep 3
+Cls
+
 _Font f&
 
 ' Borderless
