@@ -1,77 +1,98 @@
-OPTION _EXPLICIT
-_TITLE "NYE Countdown"
-$RESIZE:OFF
-SCREEN _NEWIMAGE(542, 102, 32)
-_DELAY 0.1
-_SCREENMOVE 3, 3
-CLS
+Option _Explicit
+_Title "NYE Countdown"
+$Resize:Off
+Screen _NewImage(542, 102, 32)
+_Delay 0.1
+_ScreenMove 3, 3
+Cls
 
-DIM SHARED Hr AS STRING
-DIM SHARED Min AS STRING
-DIM SHARED Sec AS STRING
-DIM SHARED MA AS SINGLE
-DIM SHARED CRGB AS DOUBLE
-DIM SHARED b AS LONG
-DIM SHARED oldb AS LONG
-DIM SHARED TimerKey AS SINGLE
-DIM SHARED rootpath AS STRING, fontfile AS STRING, style AS STRING, f AS LONG, GWL_STYLE AS SINGLE, WS_BORDER AS SINGLE, hwnd AS LONG, winstyle AS LONG, a AS LONG, Level AS SINGLE, FGwin AS LONG
-DIM SHARED y AS LONG, C AS SINGLE, FontSize AS SINGLE, PosY AS SINGLE, K AS STRING, newb AS SINGLE, hour AS STRING, H AS INTEGER, ampm AS STRING, Null AS SINGLE, Status AS STRING
+Dim Shared Hr As String
+Dim Shared Min As String
+Dim Shared Sec As String
+Dim Shared MA As Single
+Dim Shared CRGB As Double
+Dim Shared b As Long
+Dim Shared oldb As Long
+Dim Shared TimerKey As Single
+Dim Shared CoreFont As String
+Dim Shared MaxFontSize As Single
+Dim Shared CoreFontOffest, CoreFontWidthOffset, CoreFontHeightOffset As Single
+Dim Shared rootpath As String, fontfile As String, style As String, f As Long, GWL_STYLE As Single, WS_BORDER As Single, hwnd As Long, winstyle As Long, a As Long, Level As Single, FGwin As Long
+Dim Shared y As Long, C As Single, FontSize As Single, PosY As Single, K As String, newb As Single, hour As String, H As Integer, ampm As String, Null As Single, Status As String
 
-rootpath$ = ENVIRON$("SYSTEMROOT") 'normally "C:\WINDOWS"
+CoreFont = "DS-DIGIB.TTF"
+
+rootpath$ = Environ$("SYSTEMROOT") 'normally "C:\WINDOWS"
 fontfile$ = rootpath$ + "\Fonts\lucon.ttf" 'TTF file in Windows
 style$ = "monospace" 'font style is not case sensitive
-f& = _LOADFONT(fontfile$, 128, style$)
-IF f& = -1 THEN PRINT "lucon.ttf not found!": SLEEP: SYSTEM
-_FONT f&
+f& = _LoadFont(fontfile$, 128, style$)
+If f& = -1 Then Print "lucon.ttf not found!": Sleep: System
+_Font f&
 
-_FONT 16
+_Font 16
 
-rootpath$ = ENVIRON$("SYSTEMROOT") 'normally "C:\WINDOWS"
-fontfile$ = rootpath$ + "\Fonts\DS-DIGIB.TTF" 'TTF file in Windows
+CoreFontOffest = 1
+CoreFontWidthOffset = 1
+CoreFontHeightOffset = 1
+
+rootpath$ = Environ$("SYSTEMROOT") 'normally "C:\WINDOWS"
+fontfile$ = rootpath$ + "\Fonts\" + CoreFont 'TTF file in Windows
 style$ = "monospace" 'font style is not case sensitive
-f& = _LOADFONT(fontfile$, 128, style$)
-IF f& = -1 THEN PRINT "DS-DIGIB.TTF not found!": SLEEP: SYSTEM
-_FONT f&
+f& = _LoadFont(fontfile$, 128, style$)
+If f& = -1 Then
+    Print CoreFont + " not found, using default font!"
+    Sleep 10
+    Cls
+    CoreFont = "lucon.ttf"
+    fontfile$ = rootpath$ + "\Fonts\" + CoreFont 'TTF file in Windows
+    style$ = "monospace" 'font style is not case sensitive
+    f& = _LoadFont(fontfile$, 128, style$)
+    CoreFontOffest = 3.6
+    CoreFontWidthOffset = 1.18
+    CoreFontHeightOffset = 1.13
+    Screen _NewImage(542 * CoreFontWidthOffset, 102 * CoreFontHeightOffset, 32)
+End If
+_Font f&
 
 ' Borderless
-DECLARE CUSTOMTYPE LIBRARY
-    FUNCTION FindWindow& (BYVAL ClassName AS _OFFSET, WindowName$)
-END DECLARE
+Declare CustomType Library
+    Function FindWindow& (ByVal ClassName As _Offset, WindowName$)
+End Declare
 
 GWL_STYLE = -16
 WS_BORDER = &H800000
 
-hwnd& = _WINDOWHANDLE 'FindWindow(0, "No Border" + CHR$(0))
+hwnd& = _WindowHandle 'FindWindow(0, "No Border" + CHR$(0))
 
 winstyle& = GetWindowLongA&(hwnd&, GWL_STYLE)
-a& = SetWindowLongA&(hwnd&, GWL_STYLE, winstyle& AND NOT WS_BORDER)
+a& = SetWindowLongA&(hwnd&, GWL_STYLE, winstyle& And Not WS_BORDER)
 a& = SetWindowPos&(hwnd&, 0, 0, 0, 0, 0, 39)
 
 ' Always on top ------
-CONST HWND_TOPMOST%& = -1
-CONST SWP_NOSIZE%& = &H1
-CONST SWP_NOMOVE%& = &H2
-CONST SWP_SHOWWINDOW%& = &H40
+Const HWND_TOPMOST%& = -1
+Const SWP_NOSIZE%& = &H1
+Const SWP_NOMOVE%& = &H2
+Const SWP_SHOWWINDOW%& = &H40
 
-DECLARE DYNAMIC LIBRARY "user32"
-    FUNCTION SetWindowPos& (BYVAL hWnd AS LONG, BYVAL hWndInsertAfter AS _OFFSET, BYVAL X AS INTEGER, BYVAL Y AS INTEGER, BYVAL cx AS INTEGER, BYVAL cy AS INTEGER, BYVAL uFlags AS _OFFSET)
-    FUNCTION GetForegroundWindow& 'find currently focused process handle
+Declare Dynamic Library "user32"
+    Function SetWindowPos& (ByVal hWnd As Long, Byval hWndInsertAfter As _Offset, Byval X As Integer, Byval Y As Integer, Byval cx As Integer, Byval cy As Integer, Byval uFlags As _Offset)
+    Function GetForegroundWindow& 'find currently focused process handle
 
-    FUNCTION GetWindowLongA& (BYVAL hwnd AS LONG, BYVAL nIndex AS LONG)
-    FUNCTION SetWindowLongA& (BYVAL hwnd AS LONG, BYVAL nIndex AS LONG, BYVAL dwNewLong AS LONG)
+    Function GetWindowLongA& (ByVal hwnd As Long, Byval nIndex As Long)
+    Function SetWindowLongA& (ByVal hwnd As Long, Byval nIndex As Long, Byval dwNewLong As Long)
 
-    FUNCTION SetLayeredWindowAttributes& (BYVAL hwnd AS LONG, BYVAL crKey AS LONG, BYVAL bAlpha AS _UNSIGNED _BYTE, BYVAL dwFlags AS LONG)
-    FUNCTION GetWindowLong& ALIAS "GetWindowLongA" (BYVAL hwnd AS LONG, BYVAL nIndex AS LONG)
-    FUNCTION SetWindowLong& ALIAS "SetWindowLongA" (BYVAL hwnd AS LONG, BYVAL nIndex AS LONG, BYVAL dwNewLong AS LONG)
+    Function SetLayeredWindowAttributes& (ByVal hwnd As Long, Byval crKey As Long, Byval bAlpha As _Unsigned _Byte, Byval dwFlags As Long)
+    Function GetWindowLong& Alias "GetWindowLongA" (ByVal hwnd As Long, Byval nIndex As Long)
+    Function SetWindowLong& Alias "SetWindowLongA" (ByVal hwnd As Long, Byval nIndex As Long, Byval dwNewLong As Long)
 
-END DECLARE
+End Declare
 
 ' Needed for acquiring the hWnd of the window
-DIM SHARED Myhwnd AS LONG ' Get hWnd value
-Myhwnd = _WINDOWHANDLE
+Dim Shared Myhwnd As Long ' Get hWnd value
+Myhwnd = _WindowHandle
 
 Level = 200
-_DELAY .1
+_Delay .1
 
 FGwin& = GetForegroundWindow&
 ' Always on top ------
@@ -80,173 +101,178 @@ y& = SetWindowPos&(Myhwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE + SWP_NOSIZE + S
 
 SetWindowOpacity Myhwnd, Level
 
-b = _NEWIMAGE(542, 102, 32)
+MaxFontSize = 384
+b = _NewImage(542 * CoreFontWidthOffset, 102 * CoreFontHeightOffset, 32)
 C = 1
 FontSize = 128
-PosY = -24
+PosY = -24 / CoreFontOffest
 CRGB = _RGB(55, 238, 55)
-COLOR CRGB
+Color CRGB
 
 
-ON TIMER(1) Timer01
-TIMER ON
+On Timer(1) Timer01
+Timer On
 
-DO
-    K$ = UCASE$(INKEY$)
-    IF K$ <> "" THEN TimerKey = 3
-    IF TimerKey >= 1 THEN
-        _LIMIT 30
-    END IF
-    IF TimerKey <= 0 THEN
-        _LIMIT 3
-        _DELAY .333
-        IF MA > 0 THEN MA = MA - .75
-    END IF
+Do
+    K$ = UCase$(InKey$)
+    If K$ <> "" Then TimerKey = 3
+    If TimerKey >= 1 Then
+        _Limit 30
+    End If
+    If TimerKey <= 0 Then
+        _Limit 3
+        _Delay .333
+        If MA > 0 Then MA = MA - .75
+    End If
 
-    IF K$ <> "" THEN Timer01
-LOOP
+    If K$ <> "" Then Timer01
+Loop
 
-FUNCTION Clock$
-    hour$ = LEFT$(TIME$, 2): H% = VAL(hour$)
-    Min$ = MID$(TIME$, 3, 3)
-    IF H% >= 12 THEN ampm$ = " PM" ELSE ampm$ = " AM"
-    IF H% > 12 THEN
-        IF H% - 12 < 10 THEN hour$ = STR$(H% - 12) ELSE hour$ = LTRIM$(STR$(H% - 12))
-    ELSEIF H% = 0 THEN hour$ = "12" ' midnight hour
-    ELSE: IF H% < 10 THEN hour$ = STR$(H%) ' eliminate leading zeros
-    END IF
+Function Clock$
+    hour$ = Left$(Time$, 2): H% = Val(hour$)
+    Min$ = Mid$(Time$, 3, 3)
+    If H% >= 12 Then ampm$ = " PM" Else ampm$ = " AM"
+    If H% > 12 Then
+        If H% - 12 < 10 Then hour$ = Str$(H% - 12) Else hour$ = LTrim$(Str$(H% - 12))
+    ElseIf H% = 0 Then hour$ = "12" ' midnight hour
+    Else: If H% < 10 Then hour$ = Str$(H%) ' eliminate leading zeros
+    End If
     Clock$ = hour$ + Min$ + ampm$
-END FUNCTION
+End Function
 
-SUB SetWindowOpacity (hWnd AS LONG, Level)
-    DIM Msg AS LONG
-    CONST G = -20
-    CONST LWA_ALPHA = &H2
-    CONST WS_EX_LAYERED = &H80000
+Sub SetWindowOpacity (hWnd As Long, Level)
+    Dim Msg As Long
+    Const G = -20
+    Const LWA_ALPHA = &H2
+    Const WS_EX_LAYERED = &H80000
     Msg = GetWindowLong(hWnd, G)
-    Msg = Msg OR WS_EX_LAYERED
+    Msg = Msg Or WS_EX_LAYERED
     Null = SetWindowLong(hWnd, G, Msg)
     Null = SetLayeredWindowAttributes(hWnd, 0, Level, LWA_ALPHA)
-END SUB
+End Sub
 
-SUB Timer01
+Sub Timer01
     TimerKey = TimerKey - 1
 
-    IF K$ <> "" THEN
-        IF K$ = "C" THEN
+    If K$ <> "" Then
+        If K$ = "C" Then
             C = C + 1
-            IF C = 2 THEN CRGB = _RGB(33, 28, 255)
-            IF C = 3 THEN CRGB = _RGB(249, 17, 11)
-            IF C = 4 THEN CRGB = _RGB(238, 238, 238)
-            IF C = 5 THEN CRGB = _RGB(111, 116, 116)
-            IF C = 6 THEN CRGB = _RGB(216, 33, 216)
-            IF C = 7 THEN CRGB = _RGB(233, 238, 33)
-            IF C = 8 THEN CRGB = _RGB(111, 55, 211)
-            IF C = 9 THEN CRGB = _RGB(55, 128, 205)
-            IF C = 10 THEN C = 1: CRGB = _RGB(55, 238, 55)
-            COLOR CRGB
-            Status = STR$(C)
-        END IF
+            If C = 2 Then CRGB = _RGB(33, 28, 255)
+            If C = 3 Then CRGB = _RGB(249, 17, 11)
+            If C = 4 Then CRGB = _RGB(238, 238, 238)
+            If C = 5 Then CRGB = _RGB(111, 116, 116)
+            If C = 6 Then CRGB = _RGB(216, 33, 216)
+            If C = 7 Then CRGB = _RGB(233, 238, 33)
+            If C = 8 Then CRGB = _RGB(111, 55, 211)
+            If C = 9 Then CRGB = _RGB(55, 128, 205)
+            If C = 10 Then C = 1: CRGB = _RGB(55, 238, 55)
+            Color CRGB
+            Status = Str$(C)
+        End If
 
-        IF K$ = "-" THEN
+        If K$ = "-" Then
             FontSize = FontSize - 32
-            IF FontSize < 32 THEN
+            If FontSize < 32 Then
                 FontSize = 32
                 newb = 0
-            ELSE
+            Else
                 newb = 1
-            END IF
-            Status = STR$(FontSize)
-        END IF
+            End If
+            Status = Str$(FontSize)
+        End If
 
-        IF K$ = "+" THEN
+        If K$ = "+" Then
             FontSize = FontSize + 32
-            IF FontSize > 256 THEN
-                FontSize = 256
+            If FontSize > MaxFontSize Then
+                FontSize = MaxFontSize
                 newb = 0
-            ELSE
+            Else
                 newb = 1
-            END IF
-            Status = STR$(FontSize)
-        END IF
+            End If
+            Status = Str$(FontSize)
+        End If
 
-        IF K$ = "R" THEN _SCREENMOVE 3, 3: Level = 200: SetWindowOpacity Myhwnd, Level: Status = "Restore"
-        IF _KEYDOWN(27) OR K$ = CHR$(27) THEN SYSTEM
-    END IF
+        If K$ = "R" Then _ScreenMove 3, 3: Level = 200: SetWindowOpacity Myhwnd, Level: Status = "Restore"
+        If _KeyDown(27) Or K$ = Chr$(27) Then System
+    End If
 
-    IF newb = 1 THEN
+    If newb = 1 Then
         newb = 0
         oldb = b
-        IF FontSize <= 32 THEN b = _NEWIMAGE(146, 44, 32): PosY = -6
-        IF FontSize = 64 THEN b = _NEWIMAGE(282, 60, 32): PosY = -12
-        IF FontSize = 96 THEN b = _NEWIMAGE(412, 82, 32): PosY = -18
-        IF FontSize = 128 THEN b = _NEWIMAGE(542, 102, 32): PosY = -24
-        IF FontSize = 160 THEN b = _NEWIMAGE(668, 130, 32): PosY = -28
-        IF FontSize = 192 THEN b = _NEWIMAGE(804, 152, 32): PosY = -32
-        IF FontSize = 224 THEN b = _NEWIMAGE(932, 172, 32): PosY = -36
-        IF FontSize >= 256 THEN b = _NEWIMAGE(1064, 198, 32): PosY = -40
-        SCREEN b
-        _FREEIMAGE oldb ' Required to prevent memory leak
-        f& = _LOADFONT(fontfile$, FontSize, style$)
-        _FONT f&
-        COLOR CRGB
-    END IF
+        If FontSize <= 32 Then b = _NewImage(146 * CoreFontWidthOffset, 44 * CoreFontHeightOffset, 32): PosY = -6 / CoreFontOffest
+        If FontSize = 64 Then b = _NewImage(282 * CoreFontWidthOffset, 60 * CoreFontHeightOffset, 32): PosY = -12 / CoreFontOffest
+        If FontSize = 96 Then b = _NewImage(412 * CoreFontWidthOffset, 82 * CoreFontHeightOffset, 32): PosY = -18 / CoreFontOffest
+        If FontSize = 128 Then b = _NewImage(542 * CoreFontWidthOffset, 102 * CoreFontHeightOffset, 32): PosY = -24 / CoreFontOffest
+        If FontSize = 160 Then b = _NewImage(668 * CoreFontWidthOffset, 130 * CoreFontHeightOffset, 32): PosY = -28 / CoreFontOffest
+        If FontSize = 192 Then b = _NewImage(804 * CoreFontWidthOffset, 152 * CoreFontHeightOffset, 32): PosY = -32 / CoreFontOffest
+        If FontSize = 224 Then b = _NewImage(932 * CoreFontWidthOffset, 172 * CoreFontHeightOffset, 32): PosY = -36 / CoreFontOffest
+        If FontSize = 256 Then b = _NewImage(1064 * CoreFontWidthOffset, 198 * CoreFontHeightOffset, 32): PosY = -40 / CoreFontOffest
+        If FontSize = 288 Then b = _NewImage(1196 * CoreFontWidthOffset, 224 * CoreFontHeightOffset, 32): PosY = -44 / CoreFontOffest
+        If FontSize = 320 Then b = _NewImage(1328 * CoreFontWidthOffset, 248 * CoreFontHeightOffset, 32): PosY = -48 / CoreFontOffest
+        If FontSize = 352 Then b = _NewImage(1456 * CoreFontWidthOffset, 272 * CoreFontHeightOffset, 32): PosY = -52 / CoreFontOffest
+        If FontSize >= 384 Then b = _NewImage(1580 * CoreFontWidthOffset, 296 * CoreFontHeightOffset, 32): PosY = -56 / CoreFontOffest
+        Screen b
+        _FreeImage oldb ' Required to prevent memory leak
+        f& = _LoadFont(fontfile$, FontSize, style$)
+        _Font f&
+        Color CRGB
+    End If
 
     MA = MA - .75
-    IF MA >= 25 THEN MA = 25 ELSE IF MA <= 0 THEN MA = 0
-    IF _KEYDOWN(18432) THEN _SCREENMOVE _SCREENX, (_SCREENY - 1) - MA: Status = STR$(_SCREENY): MA = MA + 1
-    IF _KEYDOWN(19200) THEN _SCREENMOVE (_SCREENX - 1) - MA, _SCREENY: Status = STR$(_SCREENX): MA = MA + 1
-    IF _KEYDOWN(20480) THEN _SCREENMOVE _SCREENX, (_SCREENY + 1) + MA: Status = STR$(_SCREENY): MA = MA + 1
-    IF _KEYDOWN(19712) THEN _SCREENMOVE (_SCREENX + 1) + MA, _SCREENY: Status = STR$(_SCREENX): MA = MA + 1
+    If MA >= 25 Then MA = 25 Else If MA <= 0 Then MA = 0
+    If _KeyDown(18432) Then _ScreenMove _ScreenX, (_ScreenY - 1) - MA: Status = Str$(_ScreenY): MA = MA + 1
+    If _KeyDown(19200) Then _ScreenMove (_ScreenX - 1) - MA, _ScreenY: Status = Str$(_ScreenX): MA = MA + 1
+    If _KeyDown(20480) Then _ScreenMove _ScreenX, (_ScreenY + 1) + MA: Status = Str$(_ScreenY): MA = MA + 1
+    If _KeyDown(19712) Then _ScreenMove (_ScreenX + 1) + MA, _ScreenY: Status = Str$(_ScreenX): MA = MA + 1
 
-    IF _KEYDOWN(18688) THEN
+    If _KeyDown(18688) Then
         Level = Level + 1
-        IF Level > 255 THEN Level = 255
+        If Level > 255 Then Level = 255
         SetWindowOpacity Myhwnd, Level
-        Status = STR$(Level)
-    END IF
+        Status = Str$(Level)
+    End If
 
-    IF _KEYDOWN(20736) THEN
+    If _KeyDown(20736) Then
         Level = Level - 1
-        IF Level < 32 THEN Level = 32
+        If Level < 32 Then Level = 32
         SetWindowOpacity Myhwnd, Level
-        Status = STR$(Level)
-    END IF
+        Status = Str$(Level)
+    End If
 
-    Hr = _TRIM$(STR$(23 - VAL(MID$(TIME$, 1, 2))))
-    Min = _TRIM$(STR$(59 - VAL(MID$(TIME$, 4, 2))))
-    Sec = _TRIM$(STR$(59 - VAL(MID$(TIME$, 7, 2))))
-    IF VAL(Hr) <= 9 THEN Hr = "0" + Hr
-    IF VAL(Min) <= 9 THEN Min = "0" + Min
-    IF VAL(Sec) <= 9 THEN Sec = "0" + Sec
+    Hr = _Trim$(Str$(23 - Val(Mid$(Time$, 1, 2))))
+    Min = _Trim$(Str$(59 - Val(Mid$(Time$, 4, 2))))
+    Sec = _Trim$(Str$(59 - Val(Mid$(Time$, 7, 2))))
+    If Val(Hr) <= 9 Then Hr = "0" + Hr
+    If Val(Min) <= 9 Then Min = "0" + Min
+    If Val(Sec) <= 9 Then Sec = "0" + Sec
 
-    _PRINTSTRING (10, PosY), Hr + ":" + Min + ":" + Sec
+    _PrintString (10, PosY), Hr + ":" + Min + ":" + Sec
 
-    IF TimerKey < 0 THEN
+    If TimerKey < 0 Then
         TimerKey = 0
-        _PRINTSTRING (10, 0), "          "
-        _PRINTSTRING (10, PosY), Hr + ":" + Min + ":" + Sec
-    ELSE
+        _PrintString (10, 0), "          "
+        _PrintString (10, PosY), Hr + ":" + Min + ":" + Sec
+    Else
         fontfile$ = rootpath$ + "\Fonts\lucon.ttf" 'TTF file in Windows
         style$ = "monospace" 'font style is not case sensitive
-        f& = _LOADFONT(fontfile$, 32, style$)
-        IF f& = -1 THEN PRINT "lucon.ttf not found!": _DISPLAY: _DELAY 3: SLEEP: SYSTEM
-        _FONT f&
-        _PRINTSTRING (10, 0), "[" + _TRIM$(Status) + "] "
-        fontfile$ = rootpath$ + "\Fonts\DS-DIGIB.TTF" 'TTF file in Windows
+        f& = _LoadFont(fontfile$, 32, style$)
+        If f& = -1 Then Print "lucon.ttf not found!": _Display: _Delay 3: Sleep: System
+        _Font f&
+        _PrintString (10, 0), "[" + _Trim$(Status) + "] "
+        fontfile$ = rootpath$ + "\Fonts\" + CoreFont 'TTF file in Windows
         style$ = "monospace" 'font style is not case sensitive
-        f& = _LOADFONT(fontfile$, FontSize, style$)
-        IF f& = -1 THEN PRINT "DS-DIGIB.TTF not found!": _DISPLAY: _DELAY 3: SLEEP: SYSTEM
-        _FONT f&
-    END IF
+        f& = _LoadFont(fontfile$, FontSize, style$)
+        If f& = -1 Then Print CoreFont + " not found!": _Display: _Delay 3: Sleep: System
+        _Font f&
+    End If
 
-    _DISPLAY
-    IF Hr = "00" AND Min = "00" AND Sec = "00" THEN _DELAY 60
+    _Display
+    If Hr = "00" And Min = "00" And Sec = "00" Then _Delay 60
 
     FGwin& = GetForegroundWindow&
 
-    IF Myhwnd <> FGwin& THEN
+    If Myhwnd <> FGwin& Then
         y& = SetWindowPos&(Myhwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE + SWP_NOSIZE + SWP_SHOWWINDOW)
-    END IF
+    End If
 
-END SUB
+End Sub
